@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS shipment_status_history;
+DROP TABLE IF EXISTS shipment_statuses;
+DROP TABLE IF EXISTS shipments;
+DROP TABLE IF EXISTS delivery_services;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS payment_statuses;
+DROP TABLE IF EXISTS payment_methods;
+DROP TABLE IF EXISTS seller_order_status_history;
+DROP TABLE IF EXISTS order_statuses;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS seller_orders;
+DROP TABLE IF EXISTS orders;

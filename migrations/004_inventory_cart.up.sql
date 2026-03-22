@@ -1,0 +1,37 @@
+CREATE TABLE warehouses (
+  id BIGSERIAL PRIMARY KEY,
+  seller_id BIGINT NOT NULL,
+  name VARCHAR NOT NULL,
+  address_text VARCHAR,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (seller_id) REFERENCES sellers(id) ON DELETE CASCADE
+);
+
+CREATE TABLE inventory (
+  warehouse_id BIGINT NOT NULL,
+  sku_id BIGINT NOT NULL,
+  qty INTEGER NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (warehouse_id, sku_id),
+  FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE CASCADE,
+  FOREIGN KEY (sku_id) REFERENCES skus(id) ON DELETE CASCADE
+);
+
+CREATE TABLE carts (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  status VARCHAR NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE cart_items (
+  cart_id BIGINT NOT NULL,
+  sku_id BIGINT NOT NULL,
+  qty INTEGER NOT NULL DEFAULT 1,
+  added_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (cart_id, sku_id),
+  FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+  FOREIGN KEY (sku_id) REFERENCES skus(id) ON DELETE CASCADE
+);

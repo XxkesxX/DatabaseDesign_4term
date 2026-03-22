@@ -1,0 +1,113 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db_test:
+    image: postgres:15
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  seqwall:
+    image: ghcr.io/realkarych/seqwall:latest
+    platform: linux/amd64
+    depends_on:
+      db_test:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_test:5432/${POSTGRES_DB}?sslmode=disable
+    volumes:
+      - ./migrations:/migrations
+      - ./scripts:/scripts
+    entrypoint:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl &&
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xz &&
+        mv migrate /usr/local/bin/migrate &&
+        chmod +x /usr/local/bin/migrate &&
+        exec seqwall "$@"
+      - --
+    command:
+      - staircase
+      - --postgres-url
+      - postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_test:5432/${POSTGRES_DB}?sslmode=disable
+      - --migrations-path
+      - /migrations
+      - --migrations-extension
+      - .up.sql
+      - --upgrade
+      - /scripts/ci-up-one.sh
+      - --downgrade
+      - /scripts/ci-down-one.sh
+
+  migrator:
+    image: migrate/migrate
+    depends_on:
+      seqwall:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [
+        "-path", "/migrations",
+        "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable",
+        "up"
+      ]
+
+  seeder:
+    image: postgres:15
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./seeds:/seeds
+    entrypoint: >
+      bash -e -c "
+      if [ \"$APP_ENV\" = \"prod\" ]; then
+        echo 'Seeding запрещён в prod';
+        exit 1;
+      fi;
+
+      echo 'Start seeding...';
+
+      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/001_users_roles.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/002_addresses_sellers.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/003_catalog.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/004_inventory_cart.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/005_orders.seed.sql;
+
+      echo 'Seeding done';
+      "
