@@ -1,0 +1,22 @@
+CREATE TABLE users (
+  id BIGSERIAL PRIMARY KEY,
+  email VARCHAR NOT NULL UNIQUE,
+  phone VARCHAR UNIQUE,
+  password_hash VARCHAR NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE roles (
+  id SMALLSERIAL PRIMARY KEY,
+  code VARCHAR NOT NULL UNIQUE,
+  name VARCHAR NOT NULL
+);
+
+CREATE TABLE user_roles (
+  user_id BIGINT NOT NULL,
+  role_id SMALLINT NOT NULL,
+  PRIMARY KEY (user_id, role_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
