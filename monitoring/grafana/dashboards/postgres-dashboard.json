@@ -1,0 +1,139 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "PostgreSQL Status",
+      "targets": [
+        {
+          "expr": "pg_up{instance=\"$Instance\"}"
+        }
+      ],
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Active Connections",
+      "targets": [
+        {
+          "expr": "pg_stat_database_numbackends{instance=\"$Instance\", datname=\"$Database\"}"
+        }
+      ],
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Commit Rate",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_xact_commit{instance=\"$Instance\", datname=\"$Database\"}[5m])"
+        }
+      ],
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Rollback Rate",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_xact_rollback{instance=\"$Instance\", datname=\"$Database\"}[5m])"
+        }
+      ],
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Connections",
+      "targets": [
+        {
+          "expr": "pg_stat_database_numbackends{instance=\"$Instance\", datname=\"$Database\"}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Transactions Rate",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_xact_commit{instance=\"$Instance\", datname=\"$Database\"}[5m])",
+          "legendFormat": "commit"
+        },
+        {
+          "expr": "rate(pg_stat_database_xact_rollback{instance=\"$Instance\", datname=\"$Database\"}[5m])",
+          "legendFormat": "rollback"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Cache Activity",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_blks_hit{instance=\"$Instance\", datname=\"$Database\"}[5m])",
+          "legendFormat": "hit"
+        },
+        {
+          "expr": "rate(pg_stat_database_blks_read{instance=\"$Instance\", datname=\"$Database\"}[5m])",
+          "legendFormat": "read"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Cache Hit Ratio",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_blks_hit{instance=\"$Instance\", datname=\"$Database\"}[5m]) / (rate(pg_stat_database_blks_hit{instance=\"$Instance\", datname=\"$Database\"}[5m]) + rate(pg_stat_database_blks_read{instance=\"$Instance\", datname=\"$Database\"}[5m]))"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Deadlocks",
+      "targets": [
+        {
+          "expr": "rate(pg_stat_database_deadlocks{instance=\"$Instance\", datname=\"$Database\"}[5m])"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "Instance",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": "label_values(pg_up, instance)",
+        "refresh": 1
+      },
+      {
+        "name": "Database",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": "label_values(pg_stat_database_numbackends{datname!~\"template0|template1\"}, datname)",
+        "refresh": 1
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "title": "PostgreSQL Monitoring",
+  "uid": "postgresql-monitoring-local",
+  "version": 1
+}
