@@ -103,6 +103,109 @@
         }
       ],
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 }
+    },
+    {
+      "type": "stat",
+      "title": "Last Backup Time",
+      "targets": [
+        {
+          "expr": "backup_last_success_timestamp_seconds * 1000"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 29 }
+    },
+    {
+      "type": "stat",
+      "title": "Backup Size",
+      "targets": [
+        {
+          "expr": "backup_last_size_bytes"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 29 }
+    },
+    {
+      "type": "stat",
+      "title": "Backup Age",
+      "targets": [
+        {
+          "expr": "time() - backup_last_success_timestamp_seconds"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 29 }
+    },
+    {
+      "type": "stat",
+      "title": "MinIO Traffic Received",
+      "targets": [
+        {
+          "expr": "minio_api_requests_traffic_received_bytes"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 29 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Backup Size History",
+      "targets": [
+        {
+          "expr": "backup_last_size_bytes",
+          "legendFormat": "backup size"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 34 }
+    },
+    {
+      "type": "timeseries",
+      "title": "MinIO API Requests Rate",
+      "targets": [
+        {
+          "expr": "rate(minio_api_requests_total[5m])",
+          "legendFormat": "requests"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 34 }
+    },
+    {
+      "type": "timeseries",
+      "title": "MinIO API Errors Rate",
+      "targets": [
+        {
+          "expr": "rate(minio_api_requests_errors_total[5m])",
+          "legendFormat": "errors"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 42 }
     }
   ],
   "templating": {
@@ -135,5 +238,5 @@
   },
   "title": "PostgreSQL Monitoring",
   "uid": "postgresql-monitoring-local",
-  "version": 1
+  "version": 2
 }
