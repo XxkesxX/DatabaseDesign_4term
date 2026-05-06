@@ -1,20 +1,156 @@
 version: '3.9'
 
 services:
-  db:
-    image: postgres:15
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd1
+    hostname: etcd1
     restart: always
-    env_file:
-      - .env
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd1
+      - --data-dir=/etcd-data
+      - --initial-advertise-peer-urls=http://etcd1:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd1:2379
+      - --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - --initial-cluster-token=pg-ha-etcd
+      - --initial-cluster-state=new
+    volumes:
+      - etcd1-data:/etcd-data
+
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd2
+    hostname: etcd2
+    restart: always
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd2
+      - --data-dir=/etcd-data
+      - --initial-advertise-peer-urls=http://etcd2:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd2:2379
+      - --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - --initial-cluster-token=pg-ha-etcd
+      - --initial-cluster-state=new
+    volumes:
+      - etcd2-data:/etcd-data
+
+  etcd3:
+    image: quay.io/coreos/etcd:v3.5.17
+    container_name: etcd3
+    hostname: etcd3
+    restart: always
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd3
+      - --data-dir=/etcd-data
+      - --initial-advertise-peer-urls=http://etcd3:2380
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd3:2379
+      - --initial-cluster=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      - --initial-cluster-token=pg-ha-etcd
+      - --initial-cluster-state=new
+    volumes:
+      - etcd3-data:/etcd-data
+
+  pg1:
+    build: ./patroni
+    container_name: pg1
+    hostname: pg1
+    restart: always
+    command: >
+      bash -c "mkdir -p /var/run/postgresql /var/lib/postgresql/data &&
+               chown -R postgres:postgres /var/lib/postgresql /var/run/postgresql &&
+               exec gosu postgres patroni /etc/patroni/patroni.yml"
+    volumes:
+      - ./patroni/pg1.yml:/etc/patroni/patroni.yml:ro
+      - pg1-data:/var/lib/postgresql/data
+    ports:
+      - "8008:8008"
+    depends_on:
+      - etcd1
+      - etcd2
+      - etcd3
+
+  pg2:
+    build: ./patroni
+    container_name: pg2
+    hostname: pg2
+    restart: always
+    command: >
+      bash -c "mkdir -p /var/run/postgresql /var/lib/postgresql/data &&
+               chown -R postgres:postgres /var/lib/postgresql /var/run/postgresql &&
+               exec gosu postgres patroni /etc/patroni/patroni.yml"
+    volumes:
+      - ./patroni/pg2.yml:/etc/patroni/patroni.yml:ro
+      - pg2-data:/var/lib/postgresql/data
+    ports:
+      - "8009:8008"
+    depends_on:
+      - etcd1
+      - etcd2
+      - etcd3
+
+  db:
+    image: haproxy:2.9
+    container_name: db
+    hostname: db
+    restart: always
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
       - "${POSTGRES_PORT}:5432"
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ":7000"
+    depends_on:
+      - pg1
+      - pg2
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  db_init:
+    image: postgres:15
+    container_name: db_init
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: >
+      bash -e -c "
+      echo 'Waiting for PostgreSQL primary through HAProxy...';
+
+      until pg_isready -h db -p 5432 -U $$POSTGRES_USER -d postgres; do
+        sleep 2;
+      done;
+
+      echo 'Creating database if needed...';
+
+      psql -v ON_ERROR_STOP=1 -h db -p 5432 -U $$POSTGRES_USER -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = '$$POSTGRES_DB'\" | grep -q 1 ||
+      psql -v ON_ERROR_STOP=1 -h db -p 5432 -U $$POSTGRES_USER -d postgres -c \"CREATE DATABASE $$POSTGRES_DB\";
+
+      echo 'Creating metrics user if needed...';
+
+      if ! psql -v ON_ERROR_STOP=1 -h db -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB -tAc \"SELECT 1 FROM pg_roles WHERE rolname = '$$METRICS_USER'\" | grep -q 1; then
+        psql -v ON_ERROR_STOP=1 -h db -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"CREATE USER $$METRICS_USER WITH PASSWORD '$$METRICS_PASSWORD'\";
+      else
+        echo 'metrics user already exists';
+      fi;
+
+      psql -v ON_ERROR_STOP=1 -h db -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB -c \"GRANT pg_monitor TO $$METRICS_USER;\";
+
+      echo 'Database initialization done.';
+      "
 
   db_test:
     image: postgres:15
@@ -70,8 +206,8 @@ services:
     depends_on:
       seqwall:
         condition: service_completed_successfully
-      db:
-        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
     env_file:
       - .env
     volumes:
@@ -96,27 +232,28 @@ services:
       - ./seeds:/seeds
     entrypoint: >
       bash -e -c "
-      if [ \"$APP_ENV\" = \"prod\" ]; then
+      if [ \"$$APP_ENV\" = \"prod\" ]; then
         echo 'Seeding запрещён в prod';
         exit 1;
       fi;
 
       echo 'Start seeding...';
 
-      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/001_users_roles.seed.sql &&
-      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/002_addresses_sellers.seed.sql &&
-      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/003_catalog.seed.sql &&
-      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/004_inventory_cart.seed.sql &&
-      psql -v ON_ERROR_STOP=1 -h db -U $POSTGRES_USER -d $POSTGRES_DB -f /seeds/005_orders.seed.sql;
+      psql -v ON_ERROR_STOP=1 -h db -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seeds/001_users_roles.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seeds/002_addresses_sellers.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seeds/003_catalog.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seeds/004_inventory_cart.seed.sql &&
+      psql -v ON_ERROR_STOP=1 -h db -U $$POSTGRES_USER -d $$POSTGRES_DB -f /seeds/005_orders.seed.sql;
 
       echo 'Seeding done';
       "
+
   postgres_exporter:
     image: prometheuscommunity/postgres-exporter:latest
     restart: always
     depends_on:
-      db:
-        condition: service_healthy
+      db_init:
+        condition: service_completed_successfully
       migrator:
         condition: service_completed_successfully
     environment:
@@ -143,8 +280,10 @@ services:
       context: ./backup
     container_name: backup
     depends_on:
-      - db
-      - minio
+      db_init:
+        condition: service_completed_successfully
+      minio:
+        condition: service_started
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -194,7 +333,7 @@ services:
     ports:
       - "3001:3000"
     env_file:
-     - .env
+      - .env
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
@@ -209,3 +348,9 @@ volumes:
   postgres_data:
   minio_data:
   backup_state:
+
+  etcd1-data:
+  etcd2-data:
+  etcd3-data:
+  pg1-data:
+  pg2-data:
