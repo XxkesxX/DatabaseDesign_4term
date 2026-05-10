@@ -1,0 +1,14 @@
+Limit  (cost=559814.02..559871.34 rows=12 width=304) (actual time=52.611..73.904 rows=8 loops=1)
+  Buffers: shared hit=254281 read=18421
+  ->  Nested Loop Left Join  (cost=559814.02..559871.34 rows=12 width=304) (actual time=52.610..73.897 rows=8 loops=1)
+        ->  Hash Left Join  (cost=559812.88..559845.81 rows=12 width=264) (actual time=52.364..71.019 rows=8 loops=1)
+              Hash Cond: (so.id = f.seller_order_id)
+              ->  Nested Loop  (cost=2.39..34.90 rows=12 width=232) (actual time=0.241..1.318 rows=8 loops=1)
+              ->  Hash  (cost=543908.62..543908.62 rows=800000 width=48) (actual time=51.801..51.803 rows=500000 loops=1)
+                    ->  HashAggregate  (cost=511908.62..535908.62 rows=800000 width=48) (actual time=36.102..45.225 rows=500000 loops=1)
+                          Group Key: seller_order_feedback.seller_order_id
+                          ->  Seq Scan on seller_order_feedback  (cost=0.00..310908.50 rows=1000000 width=10) (actual time=0.025..16.775 rows=500000 loops=1)
+        ->  Aggregate  (cost=0.00..2.12 rows=1 width=16) (actual time=0.358..0.358 rows=1 loops=8)
+              ->  Seq Scan on seller_order_status_history ssh  (cost=0.00..2.10 rows=3 width=8) (actual time=0.227..0.350 rows=4 loops=8)
+Planning Time: 3.442 ms
+Execution Time: 92.514 ms

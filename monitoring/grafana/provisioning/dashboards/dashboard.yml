@@ -9,3 +9,11 @@ providers:
     editable: true
     options:
       path: /var/lib/grafana/dashboards
+  - name: "Optimization Dashboards"
+    orgId: 1
+    folder: "PostgreSQL"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/optimization-dashboards

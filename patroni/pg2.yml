@@ -24,6 +24,9 @@ bootstrap:
         wal_keep_size: 128MB
         max_wal_senders: 10
         max_replication_slots: 10
+        shared_preload_libraries: pg_stat_statements
+        pg_stat_statements.track: all
+        pg_stat_statements.max: 10000
 
   initdb:
     - encoding: UTF8
@@ -56,6 +59,9 @@ postgresql:
 
   parameters:
     unix_socket_directories: /var/run/postgresql
+    shared_preload_libraries: pg_stat_statements
+    pg_stat_statements.track: all
+    pg_stat_statements.max: 10000
 
 tags:
   nofailover: false

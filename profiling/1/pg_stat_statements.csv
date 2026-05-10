@@ -1,0 +1,8 @@
+query,mean_exec_time,calls,shared_blks_hit,shared_blks_read
+"SELECT baseline order details by order id",28.14,3512,942010,15821
+"INSERT cart item with active cart cte",9.42,3488,211340,3402
+"UPDATE inventory by sku",8.91,3491,198210,3098
+"SELECT seller revenue raw aggregate",611.02,790,1802440,72412
+"SELECT catalog health aggregate",232.44,784,1201550,40528
+"INSERT seller order status history",6.72,5120,184420,2120
+"INSERT workload event",5.81,5114,142009,1705

@@ -1,0 +1,55 @@
+{
+  "state": {
+    "testRunDurationMs": 60000
+  },
+  "metrics": {
+    "oltp_cart_write_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 12.1,
+        "min": 4.8,
+        "med": 9.7,
+        "p(90)": 17.4,
+        "p(95)": 20.6,
+        "max": 68.5
+      }
+    },
+    "oltp_inventory_update_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 10.4,
+        "min": 4.6,
+        "med": 8.5,
+        "p(90)": 14.7,
+        "p(95)": 17.5,
+        "max": 59.1
+      }
+    },
+    "log_status_insert_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 12.0,
+        "min": 4.9,
+        "med": 9.4,
+        "p(90)": 16.8,
+        "p(95)": 20.8,
+        "max": 88.0
+      }
+    },
+    "log_event_insert_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 7.2,
+        "min": 3.5,
+        "med": 6.0,
+        "p(90)": 10.4,
+        "p(95)": 13.4,
+        "max": 46.2
+      }
+    }
+  }
+}

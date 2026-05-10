@@ -1,0 +1,10 @@
+Limit  (cost=4.12..72.44 rows=12 width=304) (actual time=0.284..16.337 rows=8 loops=1)
+  Buffers: shared hit=701 read=6
+  ->  Nested Loop Left Join  (cost=4.12..72.44 rows=12 width=304) (actual time=0.283..16.331 rows=8 loops=1)
+        ->  Nested Loop  (cost=2.41..35.02 rows=12 width=232) (actual time=0.222..1.101 rows=8 loops=1)
+        ->  Aggregate  (cost=0.85..0.86 rows=1 width=48) (actual time=0.028..0.028 rows=1 loops=8)
+              ->  Index Scan using idx_seller_order_feedback_order_created_at on seller_order_feedback f  (cost=0.43..0.84 rows=1 width=10) (actual time=0.010..0.012 rows=1 loops=8)
+        ->  Aggregate  (cost=0.85..0.86 rows=1 width=16) (actual time=0.031..0.031 rows=1 loops=8)
+              ->  Index Only Scan using idx_seller_order_status_history_order_changed_at on seller_order_status_history ssh  (cost=0.43..0.84 rows=3 width=8) (actual time=0.011..0.016 rows=4 loops=8)
+Planning Time: 2.102 ms
+Execution Time: 30.211 ms

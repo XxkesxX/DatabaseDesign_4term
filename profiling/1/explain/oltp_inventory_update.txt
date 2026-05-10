@@ -1,0 +1,8 @@
+Update on inventory i  (cost=8.86..18.27 rows=1 width=24) (actual time=7.144..7.236 rows=1 loops=1)
+  Buffers: shared hit=64 read=2 dirtied=1 written=1
+  ->  Nested Loop  (cost=8.86..18.27 rows=1 width=24) (actual time=0.079..0.088 rows=1 loops=1)
+        ->  Limit  (cost=0.42..8.45 rows=1 width=14) (actual time=0.051..0.052 rows=1 loops=1)
+              ->  Index Scan using inventory_pkey on inventory  (cost=0.42..24.62 rows=2 width=14) (actual time=0.050..0.050 rows=1 loops=1)
+        ->  Index Scan using inventory_pkey on inventory i  (cost=0.42..8.45 rows=1 width=18) (actual time=0.028..0.029 rows=1 loops=1)
+Planning Time: 0.482 ms
+Execution Time: 16.274 ms

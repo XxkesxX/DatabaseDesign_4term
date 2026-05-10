@@ -1,0 +1,11 @@
+Limit  (cost=2124.48..2124.60 rows=50 width=56) (actual time=72.318..75.905 rows=50 loops=1)
+  Buffers: shared hit=18224 read=129
+  ->  Sort  (cost=2124.48..2186.31 rows=24733 width=56) (actual time=72.317..75.899 rows=50 loops=1)
+        Sort Key: revenue DESC
+        Sort Method: top-N heapsort  Memory: 40kB
+        ->  Bitmap Heap Scan on marketplace_daily_revenue  (cost=312.18..1302.90 rows=24733 width=56) (actual time=5.321..54.809 rows=36500 loops=1)
+              Recheck Cond: ((revenue_day >= (CURRENT_DATE - 365)) AND (revenue_day < (CURRENT_DATE - 0)))
+              Heap Blocks: exact=1210
+              ->  Bitmap Index Scan on idx_marketplace_daily_revenue_day_seller  (cost=0.00..306.00 rows=24733 width=0) (actual time=5.007..5.008 rows=36500 loops=1)
+Planning Time: 0.844 ms
+Execution Time: 140.311 ms

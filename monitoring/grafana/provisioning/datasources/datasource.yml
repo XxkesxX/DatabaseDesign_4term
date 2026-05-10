@@ -8,3 +8,17 @@ datasources:
     url: http://prometheus:9090
     isDefault: true
     editable: true
+  - name: PostgreSQL
+    uid: postgres
+    type: postgres
+    access: proxy
+    url: db:5432
+    database: ${POSTGRES_DB}
+    user: ${METRICS_USER}
+    secureJsonData:
+      password: ${METRICS_PASSWORD}
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false
+    editable: true

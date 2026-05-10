@@ -1,0 +1,9 @@
+Insert on workload_events  (cost=17.14..25.62 rows=1 width=92) (actual time=5.884..5.974 rows=1 loops=1)
+  Buffers: shared hit=50 read=3 dirtied=1 written=1
+  ->  Nested Loop  (cost=17.14..25.62 rows=1 width=92) (actual time=0.091..0.101 rows=1 loops=1)
+        ->  Limit  (cost=0.43..8.46 rows=1 width=8) (actual time=0.037..0.038 rows=1 loops=1)
+              ->  Index Only Scan using seller_orders_pkey on seller_orders so  (cost=0.43..8.46 rows=1 width=8) (actual time=0.036..0.036 rows=1 loops=1)
+        ->  Limit  (cost=0.42..8.44 rows=1 width=8) (actual time=0.035..0.036 rows=1 loops=1)
+              ->  Index Only Scan using users_pkey on users u  (cost=0.42..8.44 rows=1 width=8) (actual time=0.034..0.034 rows=1 loops=1)
+Planning Time: 0.466 ms
+Execution Time: 14.002 ms

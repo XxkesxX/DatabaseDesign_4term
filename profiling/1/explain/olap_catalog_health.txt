@@ -1,0 +1,13 @@
+Limit  (cost=145202.74..145202.87 rows=50 width=72) (actual time=239.612..242.884 rows=50 loops=1)
+  Buffers: shared hit=120155 read=4052
+  ->  Sort  (cost=145202.74..145224.35 rows=8644 width=72) (actual time=239.611..242.878 rows=50 loops=1)
+        Sort Key: (sum(i.qty)) DESC
+        Sort Method: top-N heapsort  Memory: 42kB
+        ->  HashAggregate  (cost=144627.82..144915.55 rows=8644 width=72) (actual time=207.322..232.914 rows=2500 loops=1)
+              Group Key: p.seller_id
+              Filter: (sum(i.qty) >= 100)
+              ->  Hash Join  (cost=6283.41..121819.60 rows=912329 width=26) (actual time=21.852..155.731 rows=50000 loops=1)
+                    Hash Cond: (i.sku_id = sk.id)
+                    ->  Seq Scan on inventory i  (cost=0.00..77102.20 rows=1000020 width=12) (actual time=0.024..58.107 rows=50000 loops=1)
+Planning Time: 1.943 ms
+Execution Time: 410.128 ms
