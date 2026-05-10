@@ -1,0 +1,11 @@
+Limit  (cost=399210.52..399210.65 rows=50 width=72) (actual time=183.812..188.906 rows=50 loops=1)
+  Buffers: shared hit=163041 read=3401
+  ->  Sort  (cost=399210.52..399275.42 rows=25960 width=72) (actual time=183.811..188.899 rows=50 loops=1)
+        Sort Key: (sum(i.qty)) DESC
+        Sort Method: top-N heapsort  Memory: 42kB
+        ->  HashAggregate  (cost=397594.72..398345.20 rows=25960 width=72) (actual time=152.304..176.221 rows=25000 loops=1)
+              Group Key: p.seller_id
+              Filter: (sum(i.qty) >= 100)
+              ->  Hash Join  (cost=24192.34..316812.22 rows=3231300 width=26) (actual time=42.318..117.506 rows=500000 loops=1)
+Planning Time: 2.214 ms
+Execution Time: 318.003 ms

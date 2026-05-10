@@ -1,0 +1,11 @@
+Insert on cart_items  (cost=8.87..17.03 rows=1 width=32) (actual time=7.922..8.017 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: cart_items_pkey
+  Buffers: shared hit=72 read=3 dirtied=2 written=1
+  ->  Nested Loop  (cost=8.87..17.03 rows=1 width=32) (actual time=0.094..0.101 rows=1 loops=1)
+        ->  Limit  (cost=0.00..8.45 rows=1 width=8) (actual time=0.042..0.043 rows=1 loops=1)
+              ->  Seq Scan on carts c  (cost=0.00..941.00 rows=1 width=8) (actual time=0.041..0.041 rows=1 loops=1)
+        ->  Limit  (cost=0.42..8.45 rows=1 width=8) (actual time=0.049..0.050 rows=1 loops=1)
+              ->  Index Scan using skus_pkey on skus  (cost=0.42..8.45 rows=1 width=8) (actual time=0.048..0.048 rows=1 loops=1)
+Planning Time: 0.614 ms
+Execution Time: 18.126 ms

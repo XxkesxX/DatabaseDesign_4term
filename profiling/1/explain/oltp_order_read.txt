@@ -1,0 +1,10 @@
+Limit  (cost=2.38..58.44 rows=12 width=248) (actual time=0.218..18.742 rows=8 loops=1)
+  Buffers: shared hit=612 read=19
+  ->  Nested Loop  (cost=2.38..58.44 rows=12 width=248) (actual time=0.217..18.737 rows=8 loops=1)
+        ->  Index Scan using orders_pkey on orders o  (cost=0.43..8.45 rows=1 width=32) (actual time=0.041..0.043 rows=1 loops=1)
+        ->  Nested Loop  (cost=1.95..49.76 rows=12 width=224) (actual time=0.174..18.689 rows=8 loops=1)
+              ->  Index Scan using users_pkey on users u  (cost=0.29..8.30 rows=1 width=34) (actual time=0.019..0.019 rows=1 loops=1)
+              ->  Index Scan using seller_orders_order_id_seller_id_key on seller_orders so  (cost=0.42..12.54 rows=2 width=24) (actual time=0.061..0.197 rows=2 loops=1)
+              ->  Index Scan using order_items_seller_order_id_sku_id_key on order_items oi  (cost=0.42..8.45 rows=2 width=28) (actual time=0.029..0.041 rows=4 loops=2)
+Planning Time: 1.832 ms
+Execution Time: 34.014 ms

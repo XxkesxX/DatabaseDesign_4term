@@ -1,0 +1,8 @@
+query,mean_exec_time,calls,shared_blks_hit,shared_blks_read
+"SELECT optimized order details with indexed lateral lookups",24.58,3521,1190040,9234
+"INSERT cart item with active cart cte",10.96,3490,251705,4026
+"UPDATE inventory by sku",9.22,3495,210112,3510
+"SELECT seller revenue from materialized view",82.04,795,182240,1298
+"SELECT catalog health aggregate",189.71,781,1630410,34018
+"INSERT seller order status history and update seller order denormalized timestamp",11.20,5074,364220,11042
+"INSERT workload event with created_at index",6.74,5066,169440,3104

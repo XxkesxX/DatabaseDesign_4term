@@ -1,0 +1,10 @@
+Insert on seller_order_status_history  (cost=9.10..17.40 rows=1 width=34) (actual time=6.912..7.018 rows=1 loops=1)
+  Buffers: shared hit=93 read=5 dirtied=3 written=2
+  ->  Nested Loop  (cost=9.10..17.40 rows=1 width=34) (actual time=0.088..0.097 rows=1 loops=1)
+        ->  Index Scan using seller_orders_pkey on seller_orders so  (cost=0.43..8.46 rows=1 width=16) (actual time=0.038..0.039 rows=1 loops=1)
+        ->  Index Scan using orders_pkey on orders o  (cost=0.43..8.46 rows=1 width=16) (actual time=0.031..0.032 rows=1 loops=1)
+        ->  Index Scan using order_statuses_code_key on order_statuses  (cost=0.15..0.17 rows=1 width=2) (actual time=0.010..0.010 rows=1 loops=1)
+Update on seller_orders  (actual time=3.902..3.908 rows=1 loops=1)
+  Buffers: shared hit=34 read=2 dirtied=1
+Planning Time: 0.694 ms
+Execution Time: 20.014 ms

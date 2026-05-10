@@ -1,0 +1,13 @@
+Limit  (cost=1598322.71..1598322.84 rows=50 width=56) (actual time=1271.223..1288.914 rows=50 loops=1)
+  Buffers: shared hit=711244 read=41250
+  ->  Sort  (cost=1598322.71..1605189.42 rows=2746685 width=56) (actual time=1271.222..1288.908 rows=50 loops=1)
+        Sort Key: (sum(((oi.qty)::numeric * oi.unit_price))) DESC
+        Sort Method: top-N heapsort  Memory: 39kB
+        ->  HashAggregate  (cost=1330284.62..1507032.18 rows=2746685 width=56) (actual time=1004.128..1219.712 rows=36500 loops=1)
+              Group Key: so.seller_id, (date_trunc('day'::text, o.created_at))::date
+              ->  Hash Join  (cost=403122.40..1058214.18 rows=18138029 width=28) (actual time=388.991..821.224 rows=4001223 loops=1)
+                    Hash Cond: (oi.seller_order_id = so.id)
+                    ->  Seq Scan on order_items oi  (cost=0.00..391884.32 rows=18000032 width=18) (actual time=0.023..241.880 rows=4000000 loops=1)
+                    ->  Hash  (cost=316214.81..316214.81 rows=4000181 width=26) (actual time=386.033..386.035 rows=2000000 loops=1)
+Planning Time: 3.283 ms
+Execution Time: 1853.706 ms

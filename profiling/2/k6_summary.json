@@ -1,0 +1,103 @@
+{
+  "state": {
+    "testRunDurationMs": 270000
+  },
+  "metrics": {
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 334.91,
+        "min": 6.4,
+        "med": 54.2,
+        "p(90)": 1120.6,
+        "p(95)": 1682.7,
+        "max": 6410.8
+      }
+    },
+    "oltp_order_read_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 55.8,
+        "min": 8.4,
+        "med": 38.2,
+        "p(90)": 78.1,
+        "p(95)": 92.7,
+        "max": 408.3
+      }
+    },
+    "oltp_cart_write_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 12.9,
+        "min": 5.1,
+        "med": 10.4,
+        "p(90)": 19.3,
+        "p(95)": 23.1,
+        "max": 74.7
+      }
+    },
+    "oltp_inventory_update_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 10.7,
+        "min": 4.9,
+        "med": 8.8,
+        "p(90)": 15.0,
+        "p(95)": 18.2,
+        "max": 61.5
+      }
+    },
+    "olap_seller_revenue_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 1338.4,
+        "min": 480.2,
+        "med": 1288.9,
+        "p(90)": 1711.6,
+        "p(95)": 1854.9,
+        "max": 6410.8
+      }
+    },
+    "olap_catalog_health_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 381.6,
+        "min": 132.8,
+        "med": 352.1,
+        "p(90)": 555.3,
+        "p(95)": 620.8,
+        "max": 1790.5
+      }
+    },
+    "log_status_insert_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 18.9,
+        "min": 5.7,
+        "med": 14.1,
+        "p(90)": 26.4,
+        "p(95)": 31.5,
+        "max": 126.2
+      }
+    },
+    "log_event_insert_latency": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 8.0,
+        "min": 3.5,
+        "med": 6.8,
+        "p(90)": 11.8,
+        "p(95)": 14.1,
+        "max": 49.6
+      }
+    }
+  }
+}

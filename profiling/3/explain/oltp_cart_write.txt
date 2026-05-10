@@ -1,0 +1,10 @@
+Insert on cart_items  (cost=8.92..17.18 rows=1 width=32) (actual time=8.612..8.719 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: cart_items_pkey
+  Buffers: shared hit=80 read=3 dirtied=2 written=1
+  ->  Nested Loop  (cost=8.92..17.18 rows=1 width=32) (actual time=0.101..0.111 rows=1 loops=1)
+        ->  Limit  (cost=0.42..8.50 rows=1 width=8) (actual time=0.048..0.049 rows=1 loops=1)
+              ->  Index Only Scan using idx_carts_user_status_id on carts c  (cost=0.42..8.50 rows=1 width=8) (actual time=0.047..0.047 rows=1 loops=1)
+        ->  Limit  (cost=0.42..8.50 rows=1 width=8) (actual time=0.049..0.050 rows=1 loops=1)
+Planning Time: 0.681 ms
+Execution Time: 20.177 ms

@@ -1,0 +1,1 @@
+REFRESH MATERIALIZED VIEW marketplace_daily_revenue;

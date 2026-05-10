@@ -1,0 +1,5 @@
+query,mean_exec_time,calls,shared_blks_hit,shared_blks_read
+"INSERT cart item with active cart cte",11.14,1468,104320,1890
+"UPDATE inventory by sku",9.51,1472,91102,1604
+"INSERT seller order status history and update seller order denormalized timestamp",11.46,1465,108774,3548
+"INSERT workload event with created_at index",6.92,1461,71450,1388

@@ -1,0 +1,8 @@
+query,mean_exec_time,calls,shared_blks_hit,shared_blks_read
+"SELECT degraded order details with feedback aggregate and lateral status history",74.66,3494,2542810,184210
+"INSERT cart item with active cart cte",11.98,3462,265330,4910
+"UPDATE inventory by sku",9.74,3477,221950,3812
+"SELECT seller revenue raw aggregate",1336.77,768,7112440,412508
+"SELECT catalog health aggregate",361.42,760,2884020,119331
+"INSERT seller order status history and update seller order denormalized timestamp",18.33,4986,512904,27840
+"INSERT workload event",7.68,4981,180221,4210
