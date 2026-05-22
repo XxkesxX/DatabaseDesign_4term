@@ -10,8 +10,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "postgres"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -37,11 +37,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "postgres"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
+          "editorMode": "code",
+          "expr": "topk(5, (pg_stat_statements_seconds_total{datname=\"mydb\"} / clamp_min(pg_stat_statements_calls_total{datname=\"mydb\"}, 1)) * on(queryid) group_left(query) pg_stat_statements_query_id)",
           "format": "table",
-          "rawSql": "SELECT regexp_replace(query, '\\s+', ' ', 'g') AS query, round(mean_exec_time::numeric, 3) AS mean_exec_time_ms, calls, shared_blks_hit, shared_blks_read FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 5",
+          "instant": true,
+          "legendFormat": "{{query}}",
           "refId": "A"
         }
       ],
@@ -50,8 +53,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "postgres"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -83,11 +86,13 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "postgres"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
+          "editorMode": "code",
+          "expr": "pg_stat_database_blks_hit{datname=\"mydb\"} / (pg_stat_database_blks_hit{datname=\"mydb\"} + pg_stat_database_blks_read{datname=\"mydb\"})",
           "format": "time_series",
-          "rawSql": "SELECT now() AS time, CASE WHEN sum(shared_blks_hit + shared_blks_read) = 0 THEN 0 ELSE sum(shared_blks_hit)::double precision / sum(shared_blks_hit + shared_blks_read) END AS cache_hit_ratio FROM pg_stat_statements",
+          "instant": false,
           "refId": "A"
         }
       ],
@@ -96,8 +101,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "postgres"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {},
@@ -130,11 +135,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "postgres"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
+          "editorMode": "code",
+          "expr": "sum by (state) (pg_stat_activity_count{datname=\"mydb\", state=~\"active|idle|idle in transaction|idle in transaction \\\\(aborted\\\\)\"})",
           "format": "table",
-          "rawSql": "SELECT coalesce(state, 'unknown') AS state, count(*) AS connections FROM pg_stat_activity WHERE datname = current_database() GROUP BY state ORDER BY state",
+          "instant": true,
+          "legendFormat": "{{state}}",
           "refId": "A"
         }
       ],
@@ -143,8 +151,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "postgres"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {},
@@ -171,11 +179,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "postgres",
-            "uid": "postgres"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
+          "editorMode": "code",
+          "expr": "sum by (state) (pg_stat_activity_count{datname=\"mydb\", state=~\"active|idle|idle in transaction|idle in transaction \\\\(aborted\\\\)\"})",
           "format": "time_series",
-          "rawSql": "SELECT now() AS time, coalesce(state, 'unknown') AS metric, count(*)::double precision AS value FROM pg_stat_activity WHERE datname = current_database() GROUP BY state",
+          "instant": false,
+          "legendFormat": "{{state}}",
           "refId": "A"
         }
       ],
