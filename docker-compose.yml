@@ -274,6 +274,10 @@ services:
   postgres_exporter:
     image: prometheuscommunity/postgres-exporter:latest
     restart: always
+    command:
+      - --collector.stat_statements
+      - --collector.stat_statements.include_query
+      - --collector.stat_statements.limit=20
     depends_on:
       db_init:
         condition: service_completed_successfully
